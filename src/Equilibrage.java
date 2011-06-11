@@ -39,10 +39,45 @@ public class Equilibrage {
 		if (total % d.size == 0) {
 			d.hasSolution = true;
 			int target = total / d.size;
-			int[] diff = new int[d.size];
-			for (int i=0; i<d.size; i++) {
-				diff[i] = d.numbers[i] - target;
-			}
+
+			int max = 0;
+			int[] previousStep = d.numbers;
+			do {
+				max = 0;
+
+				int[] diff = new int[d.size];
+				int imax = -1;
+				for (int i=0; i<d.size; i++) {
+					diff[i] = previousStep[i+1 == d.size ? 0 : i+1] - previousStep[i];
+					if (Math.abs(diff[i]) > max) { max = Math.abs(diff[i]); imax = i; }
+				}
+				int swap_pointer = imax;
+
+				if (max > 0) {
+					int[] step = new int[d.size];
+					System.arraycopy(previousStep, 0, step, 0, d.size);
+					while (swap_pointer < imax + d.size -1) {
+						int from = (swap_pointer - 1) % d.size;
+						if (from <0) from += d.size;
+						int to = swap_pointer % d.size;
+						// ex:
+						//   si swap_pointer = 1, numbers[0] <> numbers[1]
+						//   si diff[swap_pointer] > 0, numbers[0]++ et numbers[1]--
+						//   sinon numbers[0]-- et numbers[1]++
+					
+						int quantum = diff[to] < 0 ? 1 : -1;
+						if (step[from] != target && step[to] != target) {
+							step[from] += quantum;
+							step[to] -= quantum;
+						}
+
+						swap_pointer += 2;
+					}
+					d.steps.add(step);
+					print(System.out, -1, step);
+					previousStep = step;
+				}
+			} while (max > 0 && d.steps.size() < 5);
 		}
 	}
 
@@ -82,8 +117,8 @@ public class Equilibrage {
 			if (first) first = false; else bw.println();
 			if (dataset.hasSolution) {
 				bw.println(dataset.steps.size());
-				int stepNumber = 0;
-				print(bw, stepNumber, dataset.numbers);
+				print(bw, 0, dataset.numbers);
+				int stepNumber = 1;
 				for (int[] step : dataset.steps) {
 					print(bw, stepNumber, step);
 					stepNumber++;
@@ -96,6 +131,19 @@ public class Equilibrage {
 	}
 
 	void print(PrintWriter w, int stepNumber, int[] nis) {
+		w.print(stepNumber);
+		w.print(" : ");
+		w.print("(");
+		boolean first = true;
+		for (int ni : nis) {
+			if (first) first = false; else w.print(", ");
+			w.print(ni);
+		}
+		w.print(")");
+		w.println();
+	}
+
+	void print(PrintStream w, int stepNumber, int[] nis) {
 		w.print(stepNumber);
 		w.print(" : ");
 		w.print("(");
