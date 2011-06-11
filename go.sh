@@ -10,6 +10,6 @@ echo "-- Test ------------------------------"
 cp data/input.txt build/
 cp data/output.txt build/output-reference.txt
 cd build/
-java Equilibrage
-diff output.txt output-reference.txt
+java Balancer
+diff output.txt output-reference.txt && echo "OK"
 

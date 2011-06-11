@@ -2,7 +2,7 @@
 import java.io.*;
 import java.util.*;
 
-public class Equilibrage {
+public class Balancer {
 
 	static class Dataset {
 		int size;
@@ -22,7 +22,7 @@ public class Equilibrage {
 
 	Collection<Dataset> datasets;
 
-	public Equilibrage() throws Exception {
+	public Balancer() throws Exception {
 		readInput();
 		for (Dataset d : datasets) {
 			balance(d);
@@ -193,7 +193,7 @@ public class Equilibrage {
 
 	public static void main(String[] args) {
 		try {
-			new Equilibrage();
+			new Balancer();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
