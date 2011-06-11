@@ -92,7 +92,6 @@ public class Equilibrage {
 					}
 
 					d.steps.add(step);
-					print(System.out, -1, step);
 					previousStep = step;
 				}
 			}
@@ -111,18 +110,23 @@ public class Equilibrage {
 		while ((buffer = br.readLine()) != null) {
 			row ++;
 			int count = Integer.parseInt(buffer);
-			if (count > 0) {
+			if (count > 0 && count <= 64) {
 				Dataset d = new Dataset(count);
 				this.datasets.add(d);
 				buffer = br.readLine(); row ++;
 				String[] datas = buffer.split(" ");
 				if (datas.length != count) {
-					throw new Exception("input.txt ne respecte pas le format ; ligne " + row);
+					throw new Exception("Nombre de points incohérent, ligne " + row);
 				}
 				for (int i=0; i<count; i++) {
 					d.numbers[i] = Integer.parseInt(datas[i]);
+					if (d.numbers[i] < 0 || d.numbers[i] > 99) {
+						throw new Exception("Les entiers du vecteur doivent appartenir à la plage [0, 99], ligne " + row);
+					}
 				}
 				br.readLine(); row ++;
+			} else if (count != 0) {
+				throw new Exception("Un vecteur doit être de taille comprise entre 1 et 64, ligne " + row);
 			}
 		}
 	}
