@@ -1,6 +1,10 @@
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Balancer {
 
@@ -24,10 +28,42 @@ public class Balancer {
 
 	public Balancer() throws Exception {
 		readInput();
+		ExecutorService pool = Executors.newFixedThreadPool(8);
+		Collection<Future<?>> futures = new ArrayList<Future<?>>();
+		counter.set(datasets.size());
 		for (Dataset d : datasets) {
-			balance(d);
+			futures.add(pool.submit(new Task(d)));
 		}
-		writeOutput();
+		synchronized(counter) {
+			int c = counter.get();
+			while (c > 0) {
+				c = counter.get();
+				counter.wait(0, 10000);
+			}
+			pool.shutdownNow();
+		}
+	}
+	
+	AtomicInteger counter = new AtomicInteger();
+	
+	class Task implements Runnable {
+
+		private Dataset d;
+		
+		public Task(Dataset d) {
+			this.d = d;
+		}
+
+		@Override
+		public void run() {
+			balance(d);
+			synchronized(counter) {
+				counter.decrementAndGet();
+				counter.notify();
+			}
+		}
+		
+		
 	}
 
 	/**

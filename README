@@ -7,6 +7,8 @@ Données de test dans data/
 
 Compiler et tester : bash go.sh
 
+Ce code est multithreadé (8 threads).
+
 Terminé!
 --
 Frédéric Menou (@ptit_fred)
