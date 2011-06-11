@@ -33,53 +33,73 @@ public class Equilibrage {
 
 	private void balance(Dataset d) {
 		int total =0;
+		int max=0;
 		for (int ni : d.numbers) {
 			total += ni;
+			if (ni > max) max = ni;
 		}
 		if (total % d.size == 0) {
 			d.hasSolution = true;
-			int target = total / d.size;
+			final int target = total / d.size;
+			final int theoriticalSteps = max - target;
 
-			int max = 0;
+			int start=0, end=d.size-1;
 			int[] previousStep = d.numbers;
-			do {
-				max = 0;
-
-				int[] diff = new int[d.size];
-				int imax = -1;
-				for (int i=0; i<d.size; i++) {
-					diff[i] = previousStep[i+1 == d.size ? 0 : i+1] - previousStep[i];
-					if (Math.abs(diff[i]) > max) { max = Math.abs(diff[i]); imax = i; }
+			while (end - start > 0 && d.steps.size() < theoriticalSteps) {
+				while (previousStep[start] == target && start < end) {
+					start ++;
 				}
-				int swap_pointer = imax;
+				while (previousStep[end] == target && start < end) {
+					end --;
+				}
 
-				if (max > 0) {
+				if (end-start > 0) {
 					int[] step = new int[d.size];
 					System.arraycopy(previousStep, 0, step, 0, d.size);
-					while (swap_pointer < imax + d.size -1) {
-						int from = (swap_pointer - 1) % d.size;
-						if (from <0) from += d.size;
-						int to = swap_pointer % d.size;
-						// ex:
-						//   si swap_pointer = 1, numbers[0] <> numbers[1]
-						//   si diff[swap_pointer] > 0, numbers[0]++ et numbers[1]--
-						//   sinon numbers[0]-- et numbers[1]++
 					
-						int quantum = diff[to] < 0 ? 1 : -1;
-						if (step[from] != target && step[to] != target) {
-							step[from] += quantum;
-							step[to] -= quantum;
-						}
+					for (int i=start; i<=end; i++) {
+						if (step[i] > target) {
+							Direction dir = Direction.LEFT;
+							if (i == start) {
+								dir = Direction.RIGHT;
+							}
 
-						swap_pointer += 2;
+							switch (dir) {
+							case RIGHT:
+								int j=i+1;
+								do {
+									step[j-1]--;
+									step[j]++;
+								} while (step[j++] > target);
+								break;
+							case LEFT:
+								int k=i-1;
+								do {
+									step[k+1]--;
+									step[k]++;
+								} while (step[k--] > target);
+								break;
+							}
+
+							if (i == start && step[i] == target) {
+								start++;
+							}
+
+							if (i == end && step[i] == target) {
+								end--;
+							}
+						}
 					}
+
 					d.steps.add(step);
 					print(System.out, -1, step);
 					previousStep = step;
 				}
-			} while (max > 0 && d.steps.size() < 5);
+			}
 		}
 	}
+
+	enum Direction { LEFT, RIGHT }
 
 	private void readInput() throws Exception {
 		this.datasets = new ArrayList<Dataset>();
