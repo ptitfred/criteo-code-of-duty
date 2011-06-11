@@ -165,20 +165,7 @@ public class Balancer {
 		bw.flush();
 	}
 
-	void print(PrintWriter w, int stepNumber, int[] nis) {
-		w.print(stepNumber);
-		w.print(" : ");
-		w.print("(");
-		boolean first = true;
-		for (int ni : nis) {
-			if (first) first = false; else w.print(", ");
-			w.print(ni);
-		}
-		w.print(")");
-		w.println();
-	}
-
-	void print(PrintStream w, int stepNumber, int[] nis) {
+	private void print(PrintWriter w, int stepNumber, int[] nis) {
 		w.print(stepNumber);
 		w.print(" : ");
 		w.print("(");
