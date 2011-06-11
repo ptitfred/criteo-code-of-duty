@@ -5,30 +5,45 @@ import java.util.*;
 public class Equilibrage {
 
 	static class Dataset {
+		int size;
 		int[] numbers;
-		Dataset(int size) {
-			numbers = new int[size];
-			hasSolution = false;
-			steps = new LinkedList<int[]>();
-		}
 
 		boolean hasSolution;
 		Collection<int[]> steps;
+
+		Dataset(int size) {
+			this.size = size;
+			this.numbers = new int[size];
+			this.hasSolution = false;
+			this.steps = new LinkedList<int[]>();
+		}
+
 	}
 
 	Collection<Dataset> datasets;
 
 	public void go() throws Exception {
 		readInput();
-		for (Dataset : datasets) {
+		for (Dataset d : datasets) {
 			// TODO multi threader ca
-			resolve(d);
+			balance(d);
 		}
 		writeOutput();
 	}
 
-	private void resolve(Dataset d) {
-		
+	private void balance(Dataset d) {
+		int total =0;
+		for (int ni : d.numbers) {
+			total += ni;
+		}
+		if (total % d.size == 0) {
+			d.hasSolution = true;
+			int target = total / d.size;
+			int[] diff = new int[d.size];
+			for (int i=0; i<d.size; i++) {
+				diff[i] = d.numbers[i] - target;
+			}
+		}
 	}
 
 	private void readInput() throws Exception {
@@ -62,11 +77,35 @@ public class Equilibrage {
 		if (!f.exists()) f.createNewFile();
 		FileOutputStream fos = new FileOutputStream(f);
 		PrintWriter bw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(fos)));
+		boolean first = true;
 		for (Dataset dataset : this.datasets) {
-			bw.println("-1");
-			bw.println();
+			if (first) first = false; else bw.println();
+			if (dataset.hasSolution) {
+				bw.println(dataset.steps.size());
+				int stepNumber = 0;
+				print(bw, stepNumber, dataset.numbers);
+				for (int[] step : dataset.steps) {
+					print(bw, stepNumber, step);
+					stepNumber++;
+				}
+			} else {
+				bw.println("-1");
+			}
 		}
 		bw.flush();
+	}
+
+	void print(PrintWriter w, int stepNumber, int[] nis) {
+		w.print(stepNumber);
+		w.print(" : ");
+		w.print("(");
+		boolean first = true;
+		for (int ni : nis) {
+			if (first) first = false; else w.print(", ");
+			w.print(ni);
+		}
+		w.print(")");
+		w.println();
 	}
 
 	public static void main(String[] args) {
