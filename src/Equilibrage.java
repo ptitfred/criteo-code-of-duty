@@ -22,15 +22,26 @@ public class Equilibrage {
 
 	Collection<Dataset> datasets;
 
-	public void go() throws Exception {
+	public Equilibrage() throws Exception {
 		readInput();
 		for (Dataset d : datasets) {
-			// TODO multi threader ca
 			balance(d);
 		}
 		writeOutput();
 	}
 
+	/**
+	 * <p>Implémentation de l'algorithme.</p>
+	 * <p>Principe : parcourir de gauche à droite et propager un quantum vers la droite jusqu'à une case qui contient pas assez de quanta.</p>
+	 * <p>La cible pour chaque case est la moyenne. Si la cible n'est pas un entier, alors il n'y a pas de solution.</p>
+	 * <p>Si on arrive à droite on repart vers la gauche (approche optimiste).</p>
+	 * <p>Le nombre d'étape est déterminé ainsi : max(vecteur) - cible.</p>
+	 * <p>Optimisations : on ne parcourt pas tout le vecteur à chaque étape. L'idée consiste à amener à la valeur cible les cases des extrémités en priorité.
+	 * Quand une extrémité est à la cible on ne la parcourt plus par la suite en rétrécissant la fenêtre bornée par les index start et end. Ces index sont mis à jour à chaque fois qu'on le peut cad si on
+	 * met à jour une des extrémité de la fenêtre et qu'on l'amène à la valeur cible. La fenêtre peut donc bouger plusieurs fois par étape.
+	 * </p>
+	 * @param d
+	 */
 	private void balance(Dataset d) {
 		int total =0;
 		int max=0;
@@ -182,7 +193,7 @@ public class Equilibrage {
 
 	public static void main(String[] args) {
 		try {
-			new Equilibrage().go();
+			new Equilibrage();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
